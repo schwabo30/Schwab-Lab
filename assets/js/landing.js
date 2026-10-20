@@ -44,6 +44,7 @@ if(n.some(x=>['altitude','height','z','zm','altitudeagl'].includes(x))){header=i
 if(header===-1)throw Error('Time/altitude column headings were not found; OpenRocket commented headings are supported.');
 const pick=(...a)=>fields.findIndex(f=>a.includes(f)),idx={t:pick('time','t','times'),z:pick('altitude','z','zm','height','altitudeagl'),x:pick('x','xm','east','positioneastoflaunch','positioneast'),y:pick('y','ym','north','positionnorthoflaunch','positionnorth')};
 const hasXY=idx.x>=0&&idx.y>=0,rows=[];let skipped=0,order=0,dup=0,previous=-Infinity;
+const warnings=lines.slice(0,header).filter(line=>/^\s*#\s*(?:No recovery device|Discontinuity|.*warning)/i.test(line)).map(line=>line.replace(/^\s*#\s*/, '').trim().slice(0,220)).slice(0,8);
 for(let i=header+1;i<lines.length;i++){const line=lines[i].trim();if(!line||line[0]==='#')continue;const data=cells(line,sep);
 const get=k=>idx[k]<0||data[idx[k]]===''?NaN:Number(data[idx[k]]);
 const t=get('t'),z=get('z'),x=get('x'),y=get('y');
@@ -52,7 +53,7 @@ if(t<previous)order++;if(t===previous)dup++;previous=t;rows.push({t,z,x:hasXY?x:
 if(rows.length>12000)throw Error('Maximum 12,000 samples per file.')}
 rows.sort((a,b)=>a.t-b.t);const unique=[];for(const r of rows){if(unique.length&&unique.at(-1).t===r.t)unique[unique.length-1]=r;else unique.push(r)}
 if(unique.length<3)throw Error('Too few valid measurements.');
-return {name:String(name).slice(0,120),rows:unique,hasXY,confirmed:false,quality:{skipped,order,dup},id:Date.now().toString(36)+Math.random().toString(36).slice(2)}
+return {name:String(name).slice(0,120),rows:unique,hasXY,confirmed:false,quality:{skipped,order,dup,warnings},id:Date.now().toString(36)+Math.random().toString(36).slice(2)}
 }
 function displayTracks(){const el=$('trackList');el.replaceChildren();if(!state.tracks.length){el.textContent='No tracks imported.';return}
 for(const run of state.tracks){const box=document.createElement('div');box.className='entry';const title=document.createElement('strong');title.textContent=run.name;box.append(title);
@@ -78,7 +79,8 @@ if(!z)flag('Recovery-area boundary missing','Record the authorized area separate
 if(!runs.length)flag('No flight evidence','Import measured data or an independently generated OpenRocket flight export.',true);
 for(const run of runs){if(!run.hasXY)flag(run.name+': no map coordinates','This log contains no east/north data.',true);
 if(run.confirmed&&Math.abs(run.rows.at(-1).z)>10)flag(run.name+': touchdown unverified','Last altitude is not near zero; excluded from verified-endpoint counts.',true);
-if(run.quality.skipped||run.quality.order||run.quality.dup)flag(run.name+': data quality','Skipped '+run.quality.skipped+', out-of-order '+run.quality.order+', duplicate times '+run.quality.dup+'.',true)}
+if(run.quality?.skipped||run.quality?.order||run.quality?.dup)flag(run.name+': data quality','Skipped '+(run.quality.skipped||0)+', out-of-order '+(run.quality.order||0)+', duplicate times '+(run.quality.dup||0)+'.',true);
+for(const warning of run.quality?.warnings||[])flag(run.name+': source warning',warning,true)}
 if($('permission').value!=='documented')flag('Site permission outstanding','Property or launch-site permission must be independently documented.',true);
 if($('airspace').value!=='documented')flag('FAA airspace review outstanding','Map tiles do not show launch permissions, restrictions, or NOTAMs.',true);
 if($('hazard').value!=='none')flag('Safety hazards need assessment',$('hazard').value==='concern'?'A possible hazard has been reported. Seek qualified review.':'Hazards to people, aircraft and property are not yet assessed.',true);
