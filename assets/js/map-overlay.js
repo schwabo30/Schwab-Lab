@@ -3,8 +3,8 @@
 (() => {
  const $=id=>document.getElementById(id);
  let map=null, path=null, progress=null, dot=null, origin=null, lastRows=null, lastLength=0, active=false;
- let lastIndex=-1, lastRender=0;
- const dataset=()=>window.__schwabLabTest;
+ let lastIndex=-1, lastRender=0, looping=false;
+ const dataset=()=>window.FlightLab||window.__schwabLabTest;
  function notify(s){$('mapMessage').textContent=s;}
  function valid(lat,lon){return Number.isFinite(lat)&&Number.isFinite(lon)&&Math.abs(lat)<=90&&Math.abs(lon)<=180}
  function toLL(row,first){
@@ -18,7 +18,7 @@
    if(!window.L){notify('Map library unavailable. The 3D plot still works.');return}
    map=L.map('flightMap',{zoomControl:true,scrollWheelZoom:true}).setView([39,-98],4);
    const satellite=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Imagery © Esri and its imagery providers'});
-   const streets=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'});
+   const streets=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'});
    satellite.addTo(map);L.control.layers({'Satellite imagery':satellite,'Street map':streets}).addTo(map);
    map.on('click',e=>setOrigin(e.latlng.lat,e.latlng.lng,true));
    try{let saved=JSON.parse(localStorage.getItem('schwabLabMapOrigin'));if(saved&&valid(saved.lat,saved.lon))setOrigin(saved.lat,saved.lon,true)}catch(e){}
@@ -63,16 +63,16 @@
    active=true;$('flightViewer').classList.add('map-active');$('mapControls').classList.remove('hidden');
    $('modeMap').classList.add('primary');$('mode3d').classList.remove('primary');
    init();if(map){setTimeout(()=>{map.invalidateSize();draw(true)},0)}
+   if(!looping){looping=true;requestAnimationFrame(frame)}
    if(!origin)notify('Click the satellite map to select a reference point for displaying your flight track.');
  });
  $('mode3d').addEventListener('click',()=>{
    active=false;$('flightViewer').classList.remove('map-active');$('mapControls').classList.add('hidden');
    $('mode3d').classList.add('primary');$('modeMap').classList.remove('primary');
-   window.__schwabLabTest?.renderAll?.();
+   dataset()?.renderAll?.();
  });
  function applyFields(){const lat=Number($('mapLat').value),lon=Number($('mapLon').value);if($('mapLat').value.trim()&&$('mapLon').value.trim())setOrigin(lat,lon,true)}
  $('mapLat').addEventListener('change',applyFields);$('mapLon').addEventListener('change',applyFields);
  $('mapFit').addEventListener('click',()=>draw(true));
- function frame(t){if(active&&t-lastRender>100){draw();lastRender=t}requestAnimationFrame(frame)}
- requestAnimationFrame(frame);
+ function frame(t){if(!active){looping=false;return}if(t-lastRender>100){draw();lastRender=t}requestAnimationFrame(frame)}
 })();

@@ -17,7 +17,8 @@ schwab-lab/
 │   │   ├── lab.css            # Flight Lab styles
 │   │   └── physics.css        # Design Archive styles
 │   ├── js/
-│   │   ├── flight-lab.js      # Flight playback, charting and CSV parsing
+│   │   ├── flight-lab-ork-v4.js # Flight playback, charting and CSV parsing (lab.html and flight.html)
+│   │   ├── flight-lab.js      # Older copy of the above; no page loads it any more
 │   │   ├── physics-lab.js     # OpenRocket inspection and project saving
 │   │   ├── simulation-viewer.js # Saved OpenRocket data visualization
 │   │   └── jszip.min.js       # Locally bundled JSZip ZIP reader
@@ -114,7 +115,7 @@ Schwab Lab is for **educational visualization and post-flight analysis**. Its bu
 
 - Change homepage text/markup in `index.html` and colors/layout in `assets/css/home.css`.
 - Change Flight Lab controls/markup in `lab.html` and styling in `assets/css/lab.css`.
-- Change data-processing and visualization logic in `assets/js/flight-lab.js`.
+- Change data-processing and visualization logic in `assets/js/flight-lab-ork-v4.js`. Run `python3 tests/site_check.py` and `node tests/csv_parser_check.js` before committing.
 - Publish updates simply by committing changes to `main` after enabling Pages.
 
 

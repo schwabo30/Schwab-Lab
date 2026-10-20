@@ -8,3 +8,5 @@ button,input,select{font:inherit}button{cursor:pointer}.header{height:74px;displ
 .header .home-link{background:#143147;text-decoration:none;border-color:#31526b;color:#d9eafa}
 .header .home-link:hover{background:#1f4861}
 @media(max-width:760px){.header .righthead{display:flex}.header .righthead .pill{display:none}.header .home-link{font-size:11px;padding:8px 10px}.brand-title{font-size:17px}.brand-sub{font-size:8px;letter-spacing:1.4px}}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+#scene:focus-visible{outline:2px solid #5de4cf;outline-offset:-2px}
