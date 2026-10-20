@@ -192,3 +192,21 @@ Expected serial line, with comma-separated **numeric** values: `time,pressure,te
 The CAD Library (`cad.html`) now accepts `.ork` files alongside STL, OBJ and 3MF. It reads OpenRocket's ZIP archive containing `rocket.ork` (or its uncompressed XML form), validates size and XML structure, and shows a **non-scaled component hierarchy** with available component lengths/radii converted from meters to millimeters. The original `.ork` bytes, study notes, project tag and revision can be stored in the existing local CAD library, exported as a `.schwabcad.json` record, and reopened.
 
 An `.ork` is not a mesh. The component hierarchy **does not represent actual surface geometry, placement, printable parts, or a validated digital twin**; the tool does not export manufacturable rocket geometry or generate slicer files from `.ork`. 8 MB maximum import, with limits for archive entries, XML length and displayed components. Existing STL/OBJ/3MF inspection remains available.
+
+## Landing Zone Analysis
+
+Open [Landing Zone Analysis](landing.html) to compare already-recorded or separately simulated flight logs against an independently designated recovery area. This workspace does **not** predict future geographic landing coordinates, select launch parameters, solve an inverse trajectory problem, or send control signals.
+
+Features:
+- Satellite/street basemaps with selectable site reference and a circular recovery-area boundary.
+- Up to 10 CSV logs, each up to 4 MB and 12,000 samples. OpenRocket commented column headers are recognized.
+- Recorded horizontal position overlays; altitude-only logs remain unmapped.
+- A final sample is not called a landing unless the user confirms touchdown. Source records with clearly non-ground terminal altitude are excluded from verified-endpoint counts.
+- User-supplied measurement-uncertainty circles; not calibrated confidence regions.
+- Site date, weather notes and optional Open-Meteo historical/model data, plus read-only OpenRocket design metadata or imported Schwab project parameters.
+- Preliminary review flags for permissions, airspace review, missing measurements and existing OpenRocket export warnings.
+- IndexedDB save/reopen and portable JSON study export/import, with notes and revisions.
+
+Results describe only imported records and do not establish legal permission, airspace status, future landing predictions or recovery guarantees. See [14 CFR Part 101](https://www.ecfr.gov/current/title-14/chapter-I/subchapter-F/part-101).
+
+Privacy: map tiles are fetched from external providers and optional weather lookup sends the selected coordinates and date to Open-Meteo. Imported raw logs remain in the local browser unless you explicitly export or share them. Exported project files can include geographic coordinates.
